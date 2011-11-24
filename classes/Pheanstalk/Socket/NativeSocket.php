@@ -104,7 +104,7 @@ class NativeSocket implements \Pheanstalk\Socket
 
 			if ($this->_wrapper()->feof($this->_socket))
 			{
-				throw new Exception\ConnectionException(666, "Socket closed by server!");
+				throw new Exception\SocketException(666, "Socket closed by server!");
 			}
 		}
 		while ($data === false);

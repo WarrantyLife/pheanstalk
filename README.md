@@ -17,8 +17,8 @@ beanstalkd up to the latest version 1.4 is supported.  All commands and response
 Usage Example
 -------------
 
-<pre><code class="php">
-&lt;?php
+```php
+<?php
 
 // register Pheanstalk class loader
 require_once('pheanstalk_init.php');
@@ -44,15 +44,14 @@ echo $job->getData();
 
 $pheanstalk->delete($job);
 
-?&gt;
-</code></pre>
+?>
+```
 
 
 Running the tests
 -----------------
 
-<pre><code>
-
+```
 # ensure you have simpletest
 $ git submodule init
 $ git submodule update
@@ -80,7 +79,7 @@ Available options:
   --with-server      Includes tests which connect to a beanstalkd server
   --testfile <path>  Only run the specified test file.
   --help             This documentation.
-</code></pre>
+```
 
 
 Contributors
@@ -93,6 +92,9 @@ Contributors
   * [leprechaun](https://github.com/leprechaun)
   * [Peter McArthur](https://github.com/ptrmcrthr)
   * [robbiehudson](https://github.com/robbiehudson)
+  * [Geoff Catlin](https://github.com/gcatlin)
+  * [srjlewis](https://github.com/srjlewis)
+  * .. [more?](https://github.com/pda/pheanstalk/contributors) Let me know if you're missing.
   * [Brian Nelson](https://github.com/mrpoundsign)
   * .. more? Let me know if you're missing.
 
@@ -100,6 +102,6 @@ Contributors
 Licence
 -------
 
-(c) Paul Annesley
+© Paul Annesley
 
 Released under the [The MIT License](http://www.opensource.org/licenses/mit-license.php)

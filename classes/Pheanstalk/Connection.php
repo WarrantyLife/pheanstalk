@@ -16,7 +16,7 @@ class Connection
 	const DEFAULT_CONNECT_TIMEOUT = 2;
 
 	// responses which are global errors, mapped to their exception short-names
-	private $_errorResponses = array(
+	private static $_errorResponses = array(
 		Response::RESPONSE_OUT_OF_MEMORY => 'OutOfMemory',
 		Response::RESPONSE_INTERNAL_ERROR => 'InternalError',
 		Response::RESPONSE_DRAINING => 'Draining',
@@ -25,7 +25,7 @@ class Connection
 	);
 
 	// responses which are followed by data
-	private $_dataResponses = array(
+	private static $_dataResponses = array(
 		Response::RESPONSE_RESERVED,
 		Response::RESPONSE_FOUND,
 		Response::RESPONSE_OK,
@@ -43,7 +43,7 @@ class Connection
 	 */
 	public function __construct($hostname, $port, $connectTimeout = null)
 	{
-		if (is_null($connectTimeout))
+		if (is_null($connectTimeout) || !is_numeric($connectTimeout))
 			$connectTimeout = self::DEFAULT_CONNECT_TIMEOUT;
 
 		$this->_hostname = $hostname;
@@ -53,7 +53,8 @@ class Connection
 
 	/**
 	 * Sets a manually created socket, used for unit testing.
-	 * @param Pheanstalk_Socket $socket
+	 *
+	 * @param Socket $socket
 	 * @chainable
 	 */
 	public function setSocket(Socket $socket)
@@ -64,8 +65,8 @@ class Connection
 
 	/**
 	 * @param object $command Pheanstalk_Command
-	 * @return object \Pheanstalk\Response
-	 * @throws Pheanstalk_Exception_ClientException
+	 * @return object Response
+	 * @throws \Pheanstalk\Exception\ClientException
 	 */
 	public function dispatchCommand($command)
 	{
@@ -83,11 +84,11 @@ class Connection
 		$responseLine = $socket->getLine();
 		$responseName = preg_replace('#^(\S+).*$#s', '$1', $responseLine);
 
-		if (isset($this->_errorResponses[$responseName]))
+		if (isset(self::$_errorResponses[$responseName]))
 		{
 			$exception = sprintf(
 				'\Pheanstalk\Exception\Server%sException',
-				$this->_errorResponses[$responseName]
+				self::$_errorResponses[$responseName]
 			);
 
 			throw new $exception(sprintf(
@@ -97,7 +98,7 @@ class Connection
 			));
 		}
 
-		if (in_array($responseName, $this->_dataResponses))
+		if (in_array($responseName, self::$_dataResponses))
 		{
 			$dataLength = preg_replace('#^.*\b(\d+)$#', '$1', $responseLine);
 			$data = $socket->read($dataLength);
@@ -122,10 +123,41 @@ class Connection
 			->parseResponse($responseLine, $data);
 	}
 
+	/**
+	 * Returns the connect timeout for this connection.
+	 *
+	 * @return float
+	 */
+	public function getConnectTimeout()
+	{
+		return $this->_connectTimeout;
+	}
+
+	/**
+	 * Returns the host for this connection.
+	 *
+	 * @return string
+	 */
+	public function getHost()
+	{
+		return $this->_hostname;
+	}
+
+	/**
+	 * Returns the port for this connection.
+	 *
+	 * @return int
+	 */
+	public function getPort()
+	{
+		return $this->_port;
+	}
+
 	// ----------------------------------------
 
 	/**
 	 * Socket handle for the connection to beanstalkd
+	 *
 	 * @return Pheanstalk_Socket
 	 * @throws Pheanstalk_Exception_ConnectionException
 	 */
